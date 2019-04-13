@@ -407,14 +407,15 @@ export default {
                     //发送请求提交id数组
                     this.request.get("/goods/multipledeletedata",{selectId:this.selectId})  
                     .then(res => {
-                        console.log(res);
+                        // console.log(res);
                         //接收响应数据
                         let{code,reason}=res;
                         if(code === 0){
                             this.$message({
                                 type:'success',
                                 message:reason
-                            })
+                            });
+                            this.getGoodsData();
                         }else{
                             this.$message({
                                 type:'error',

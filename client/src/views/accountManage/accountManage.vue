@@ -101,6 +101,19 @@ import { longStackSupport } from 'q';
 
 export default {
   data() {
+    //定义修改用户名重名验证函数
+    const checkAccount = (rule, value, callback) => {
+      if (value === "") {
+        return callback(new Error("请输入账户名"));
+      } else if (value.length<3 || value.length>6) {
+        return callback(
+          new Error("账户名长度在3~6之间")
+        );
+      } else{
+        //请求验证账户名是否存在
+        this.checkAccountExist(callback);
+      }
+    };
     return {
       tableData: [
       ],
@@ -114,13 +127,7 @@ export default {
       //修改表单验证
       rules:{
         account:[
-          { required: true, message: "请输入账户名", trigger: "blur" },
-          {
-            min: 3,
-            max: 8,
-            message: "请输入长度在3~8之间的账户名",
-            trigger: "blur"
-          }
+          { required: true, validator:checkAccount}
         ],
         usergroup:[]
       },
@@ -339,6 +346,29 @@ export default {
     //取消选择函数
     cancleSelect(){
       this.$refs.multipleTable.clearSelection();
+    },
+    //请求验证用户名是否存在
+    checkAccountExist(callback){
+      //发送请求
+      this.request.get("/account/checkeditaccountexist",{account:this.editaccountForm.account,editId:this.editId})
+      .then(res => {
+        // console.log(res);
+        //接收参数
+        let{code,reason}=res;
+        if(code === 0){
+          callback();
+        }else if(code === 1){
+          return callback(
+            new Error(reason)
+          );
+        }else if(code === 2){
+          callback();          
+        }
+        
+      })
+      .catch(err => {
+        console.log(err);
+      });
     }
   },
   //created钩子函数发送请求

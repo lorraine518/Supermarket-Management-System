@@ -47,6 +47,7 @@ import {accountaddRequest} from "@/api/requestApi"
 export default {
   data() {
     //自定义校验规则
+    //验证密码合法
     const confirmpassword = (rule, value, callback) => {
       if (value === "") {
         return callback(new Error("确认密码不能为空"));
@@ -57,6 +58,7 @@ export default {
         callback();
       }
     };
+    //验证确认密码
     const checkpassword = (rule, value, callback) => {
       if (value === "") {
         return callback(new Error("请输入密码"));
@@ -72,6 +74,19 @@ export default {
         callback();
       }
     };
+    //验证账户名
+    const checkAccount = (rule, value, callback) => {
+      if (value === "") {
+        return callback(new Error("请输入账户名"));
+      } else if (value.length<3 || value.length>6) {
+        return callback(
+          new Error("账户名长度在3~6之间")
+        );
+      } else{
+        //请求验证账户名是否存在
+        this.checkAccountExist(callback);
+      }
+    };
     return {
       accountaddForm: {
         account: "",
@@ -81,13 +96,7 @@ export default {
       },
       rules: {
         account: [
-          { required: true, message: "请输入账户名", trigger: "blur" },
-          {
-            min: 3,
-            max: 8,
-            message: "请输入长度在3~8之间的账户名",
-            trigger: "blur"
-          }
+          { required: true,validator:checkAccount}
         ],
         password: [
           { required: true, validator: checkpassword, trigger: "blur" }
@@ -146,6 +155,26 @@ export default {
     },
     resetForm() {
       this.$refs.accountaddForm.resetFields();
+    },
+    //请求验证用户名是否存在
+    checkAccountExist(callback){
+      //发送请求
+      this.request.get("/account/checkaccountexist",{account:this.accountaddForm.account})
+      .then(res => {
+        // console.log(res);
+        //接收参数
+        let{code,reason}=res;
+        if(code === 0){
+          callback();
+        }else{
+          return callback(
+            new Error(reason)
+          );
+        }
+      })
+      .catch(err => {
+        console.log(err);
+      });
     }
   }
 };

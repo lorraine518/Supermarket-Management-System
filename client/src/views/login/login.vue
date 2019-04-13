@@ -58,6 +58,7 @@ export default {
         callback();
       }
     };
+
     return {
       loginForm: {
         account: "",
@@ -91,12 +92,39 @@ export default {
                 //收集数据
                 let params={
                     account: this.loginForm.account,
-                    password: this.loginForm.password,
-                    confirmpassword: this.loginForm.confirmpassword
-                }
-                console.log(params);
-                //页面跳转
-                this.$router.push("/home");
+                    password: this.loginForm.password
+                };
+                //发送请求
+                this.request.post("/login/checkaccount",params)
+                .then(res => {
+                  // console.log(res);
+                  //接收响应数据
+                  let {code,reason,token}=res;
+
+                  //验证成功
+                  if(code === 0){
+                    this.$message({
+                      type:"success",
+                      message:reason
+                    });
+                    //将token信息存入localStorage
+                    // console.log(this.local);
+                    this.local.save("z_l_y_p_s_2019",token);
+                    //页面跳转
+                    this.$router.push("/home");
+                  }else{
+                    //验证失败
+                    this.$message({
+                      type:"error",
+                      message:reason
+                    });
+                  }
+                })
+                .catch(err => {
+                  console.log(err);
+                });
+
+                
             }else{
                 console.log("验证失败！");
                 return;
@@ -104,7 +132,7 @@ export default {
         })
     },
     resetForm() {
-        this.$refs.loginForm.resetFields();
+        this.$refs.loginForm.resetFields(); 
     }
   }
 };

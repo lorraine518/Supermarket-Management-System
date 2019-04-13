@@ -70,7 +70,8 @@ export default {
                 confirmNewPassword:[
                     {required:true,validator:confirmNewPassword}
                 ]
-            }
+            },
+            currentPassword:""
         }
     },
     methods:{
@@ -92,6 +93,17 @@ export default {
             });
         },
 
+    },
+    created(){
+        this.request.get("/login/currentaccount")
+        .then(res => {
+            console.log(res);
+            let(password)=res;
+
+        })
+        .catch(err => {
+            console.log(err);
+        })
     }
 }
 </script>
