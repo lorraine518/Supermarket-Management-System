@@ -112,5 +112,4 @@ router.get("/multipledelete",(req,res,next) => {
   })
 })
 
-
 module.exports = router;
