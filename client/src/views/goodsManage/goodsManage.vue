@@ -6,11 +6,12 @@
             </div>
 
             <div class="goodsmanageform">
-                <el-form :model="goodssearchForm" status-icon :rules="rules" ref="goodssearchForm" label-width="100px" class="demo-ruleForm">
+                <el-form :model="goodssearchForm" status-icon :rules="rules" ref="goodssearchForm" label-width="100px" class="demo-ruleForm" size="mini">
                      <el-form-item prop="goodsgroup">
                         <el-select v-model="goodssearchForm.goodsgroup" placeholder="选择分类" style="width:120px;">
                         <el-option label="日用品" value="日用品"></el-option>
                         <el-option label="食品" value="食品"></el-option>
+                        <el-option label="全部" value="全部"></el-option>
                         </el-select>
                     </el-form-item>
 
@@ -214,7 +215,7 @@ export default {
                     {}
                 ],
                 keywords:[
-                    {required:true,message:"请输入关键字"}
+                    {}
                 ]
             },
             //表格渲染数据
@@ -261,18 +262,21 @@ export default {
             //发送当前页和页面显示数量
             let params={
                 pageSize:this.pageSize,
-                currentPage:this.currentPage
+                currentPage:this.currentPage,
+                //查询表单字段
+                goodsgroup:this.goodssearchForm.goodsgroup,
+                keywords:this.goodssearchForm.keywords
             };
             this.request.get("/goods/goodsmanage",params)
             .then(res => {
                 // console.log(res);
-                //接收响应数据
+                // 接收响应数据
                 let{totalData,data}=res;
                 //渲染数据到页面
                 this.totalData=totalData;
                 this.goodsData=data;
 
-                //如果当前页面所有数据都被删除，则请求上一页的数据
+                // 如果当前页面所有数据都被删除，则请求上一页的数据
                 if(!data.length && this.currentPage>1){
                     this.currentPage-=1;
                     //请求数据
@@ -285,14 +289,7 @@ export default {
         },
         //请求查找商品
         searchGoods(){
-            //收集数据
-            let params={
-                goodsgroup:this.goodssearchForm.goodsgroup,
-                keywords:this.goodssearchForm.keywords
-            }
-            // console.log(params);
-            //跳转页面
-            this.$router.push("/home/goodsmanage");
+            this.getGoodsData();
         },
         //请求删除数据
         deleteGoodsData(id){

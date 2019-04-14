@@ -17,6 +17,10 @@
                 </el-date-picker>
                 <el-button type='success' @click='submitForm'>提交</el-button>
             </div>
+
+            <div class="saleschart" style="height:300px">
+
+            </div>
         </el-card>
     </div>
 </template>
@@ -59,11 +63,50 @@ export default {
         submitForm(){
             //获取参数
             let params={
-                searchDate:this.searchDate
+                startDate:this.searchDate[0],
+                endDate:this.searchDate[1]
             }
             console.log(params);    //参数为开始时间与结束时间的数组
-            
+        },
+        //生成统计图表
+        getTotalChart(categoryData=[],value=[]){
+            //初始化容器
+            const chartContainer=this.echarts.init(document.querySelector(".saleschart"));
+            //准备配置
+            let option = {
+                tooltip: {
+                    show: true
+                },
+                legend: {
+                    data:['销量']
+                },
+                xAxis : [
+                    {
+                        type : 'category',
+                        data : ["1月","2月","3月","4月","5月","6月","7月","8月","9月","10月"]
+                    }
+                ],
+                yAxis : [
+                    {
+                        type : 'value'
+                    }
+                ],
+                series : [
+                    {
+                        "name":"销量",
+                        "type":"line",
+                        "data":[100,120,45,324,145,80,55,220,256,34]
+                    }
+                ]
+            }
+            //生成图表
+            chartContainer.setOption(option);
         }
+    },
+    mounted(){
+        //请求数据
+
+        this.getTotalChart();
     }
 }
 </script>

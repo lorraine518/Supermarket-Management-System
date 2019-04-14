@@ -57,9 +57,18 @@ router.post('/goodsadd', function(req, res, next) {
 //请求商品列表路由（分页功能）
 router.get("/goodsmanage", (req,res,next) => {
     //获取参数
-    let {pageSize,currentPage}=req.query;
+    let {pageSize,currentPage,goodsgroup,keywords}=req.query;
     //查询数据总条数
-    let sqlStr="select * from goods order by id desc";
+    //准备where语句拼接条件
+    let sqlStr="select * from goods where 1=1";
+    //判断参数
+    if(goodsgroup !== "" && goodsgroup !== "全部"){
+        //拼接查询条件
+        sqlStr+=` and goodsgroup='${goodsgroup}'`;
+    }
+    if(keywords !== ""){
+        sqlStr+=` and (goodsname like '%${keywords}%' or goodscode like '%${keywords}%')`
+    }
     connection.query(sqlStr,(err,data) => {
         if(err) throw err;
         let totalData=data.length;

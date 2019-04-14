@@ -8,6 +8,7 @@
   "dependencies": {
     "cookie-parser": "~1.4.3",
     "debug": "~2.6.9",
+    "echarts": "^4.2.1",
     "ejs": "~2.5.7",
     "express": "~4.16.0",
     "express-jwt": "^5.3.1",

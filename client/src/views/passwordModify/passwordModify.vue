@@ -38,9 +38,11 @@ export default {
                 return callback(new Error("请输入新的密码"));
             }else if(!checkReg(value)){
                 return callback(new Error("以字母开头，长度在3~6之间，只能包含字符、数字和下划线")); 
-            }else{
+            }else if(this.passwordmodifyForm.newPassword === this.passwordmodifyForm.password){
+                return callback(new Error("新旧密码不能一致")); 
+            }else{    
                 if(this.passwordmodifyForm.confirmNewPassword !==""){
-                    this.$refs.passwordmodifyForm.validateField("confirmNewPassword")
+                    this.$refs.passwordmodifyForm.validateField("confirmNewPassword");
                 }
                 callback();
             }
@@ -79,31 +81,54 @@ export default {
             //触发验证
             this.$refs.passwordmodifyForm.validate(valid => {
                 if(valid){
-                    //收集数据
-                    let params={
-                        password:this.passwordmodifyForm.password,
-                        newPassword:this.passwordmodifyForm.newPassword
-                    };
-                    //页面跳转
-                    this.$router.push("/home");
+                    //发送请求验证当前用户密码是否正确
+                    this.request.get("/login/checkpassword",{password:this.passwordmodifyForm.password})
+                    .then(res => {
+
+                        //接收响应数据
+                        let{code,message}=res;
+                        if(code === 0){
+                            //发送新密码请求保存修改
+                            this.request.post("/account/passwordmodify",{newPassword:this.passwordmodifyForm.newPassword})
+                            .then(res => {
+                                // console.log(res);
+                                
+                                let{code,message}=res;
+                                if(code === 0){
+                                    this.$message({
+                                        type:"success",
+                                        message
+                                    });
+                                    //删除token
+                                    this.local.remove("z_l_y_p_s_2019");
+                                    //跳转登录页面
+                                    this.$router.push("/login");
+                                }else{
+                                    this.$message({
+                                        type:"error",
+                                        message
+                                    })
+                                }
+                            })
+                            .catch(err => {
+
+                            })
+                        }else if(code === 1){
+                            this.$message({
+                                type:"error",
+                                message
+                            })
+                        }
+                    })
+                    .catch(err => {
+                        console.log(err);
+                    })
                 }else{
                     console.log("验证失败");
                     return;
                 }
             });
-        },
-
-    },
-    created(){
-        this.request.get("/login/currentaccount")
-        .then(res => {
-            console.log(res);
-            let(password)=res;
-
-        })
-        .catch(err => {
-            console.log(err);
-        })
+        }
     }
 }
 </script>

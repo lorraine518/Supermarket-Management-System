@@ -13,6 +13,8 @@ router.all("*",(req,res,next) => {
 })
 
 /* 验证token信息 */
+//引入jsonwebtoken
+const jwt = require('jsonwebtoken');
 // 准备签名
 const secretKey = 'lorraine';
 /* 验证token的合法性 */
@@ -122,6 +124,7 @@ router.get("/accountedit",(req,res,next) => {
     res.send(data)
   })
 });
+
 //请求保存修改路由
 router.post("/saveaccountedit",(req,res,next) => {
   //接收参数
@@ -130,6 +133,7 @@ router.post("/saveaccountedit",(req,res,next) => {
   connection.query(sqlStr,(err,data) => {
     if(err) throw err;
     if(data.affectedRows > 0){
+      //响应修改状态
       res.send({code:0,reason:"修改成功！"})
     }else{
       res.send({code:1,reason:"修改失败！"})
@@ -173,6 +177,21 @@ router.get("/multipledelete",(req,res,next) => {
   connection.query(sqlStr,(err,data) => {
     if(data.affectedRows > 0){
       res.send({code:0,reason:"批量删除成功！"})
+    }
+  })
+})
+
+//请求保存新密码路由
+router.post("/passwordmodify",(req,res,next) => {
+
+  let{newPassword}=req.body;
+  const sqlStr=`update account set password='${newPassword}' where id=${req.user.id}`
+  connection.query(sqlStr,(err,data) => {
+    if(err) throw err;
+    if(data.affectedRows > 0){
+      res.send({code:0,message:"修改密码成功！"})
+    }else{
+      res.send({code:1,message:"修改密码失败！"})      
     }
   })
 })

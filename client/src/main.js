@@ -3,6 +3,7 @@ import App from './App.vue' //引入顶部组件
 import router from './router' //引入路由
 import request from "./utils/request" //引入封装后的axios
 import ElementUI from 'element-ui'
+import echarts from 'echarts'
 import 'element-ui/lib/theme-chalk/index.css'
 //引入公用样式
 import "./assets/css/base.css"
@@ -12,6 +13,7 @@ import local from "./utils/localStorage"
 Vue.config.productionTip = false  //生产环境中不产生提示
 Vue.prototype.request=request;  //将封装后的axios挂载在Vue原型上
 Vue.prototype.local=local;
+Vue.prototype.echarts=echarts;
 
 Vue.use(ElementUI);
 

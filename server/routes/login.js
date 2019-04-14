@@ -58,6 +58,7 @@ router.post("/checkaccount",(req,res,next) => {
                 const token = jwt.sign(Object.assign({}, data[0]), secretKey, { expiresIn:60*60*2})
                 if(data.length){
                     res.send({code:0,reason:`登陆成功！欢迎您，${account}！`,token});
+                    //登陆成功派发token
                 }else{
                     res.send({code:1,reason:"您输入的密码不正确，请重新输入！"});
                 }
@@ -74,5 +75,16 @@ router.get("/currentaccount",(req,res,next) => {
     res.send(req.user)
 })
 
+//请求验证当前用户密码
+router.get("/checkpassword",(req,res,next) => {
+    //token保存的为登陆时的旧密码，修改后的新密码无法通过验证
+    let{password}=req.query;
+    if(req.user.password !== password){
+        res.send({code:1,message:"密码输入错误，请重新输入！"})
+    }else{
+        res.send({code:0,message:"可以修改密码"})
+        
+    }
+})
 
 module.exports = router;
