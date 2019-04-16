@@ -4,7 +4,8 @@
             <div slot="header" class="clearfix">
                 <span>商品管理</span>
             </div>
-
+            
+            <!-- 查询 -->
             <div class="goodsmanageform">
                 <el-form :model="goodssearchForm" status-icon :rules="rules" ref="goodssearchForm" label-width="100px" class="demo-ruleForm" size="mini">
                      <el-form-item prop="goodsgroup">
@@ -88,6 +89,7 @@
                         </template>
                     </el-table-column>
                 </el-table>
+                
                 <div class="btns" style="margin-top: 20px">
                     <el-button type="danger" @click="multipleDeleteGoodsData">全部删除</el-button>
                     <el-button @click="cancleDelete">取消选择</el-button>
@@ -277,6 +279,9 @@ export default {
                     //请求数据
                     this.getGoodsData();
                 }
+
+                //关键字显色
+                // this.showKeywords(data);
             })
             .catch(err => {
                 console.log(err);
@@ -285,18 +290,28 @@ export default {
         //请求查找商品
         searchGoods(){
             this.getGoodsData();
+            this.showKeywords();
         },
         //关键字显色
-        showKeywords(data){
+        showKeywords(data){ //未实现功能
             //获取关键字
             let keywords=this.goodssearchForm.keywords;
             //遍历数据数组
             for(const i in data){
-                if(data[i].goodsname.includes(keywords) || data[i].goodscode.includes(keywords)){
-                    //生成带有样式类的标签
-                    
+                if(keywords){
+                    if(data[i].goodsname.includes(keywords)){
+                        //拆分该数据
+                        let strArr=data[i].goodsname.split(keywords);
+                        data[i].goodsname=`${strArr[0]}<span style=\"color: red;\">${keywords}</span>${strArr[1]}`;
+                    }
 
+                    if(data[i].goodscode.includes(keywords)){
+                        //拆分该数据
+                        let strArr=data[i].goodscode.split(keywords);
+                        data[i].goodscode=`${strArr[0]}<span style=\"color: red;\">${keywords}</span>${strArr[1]}`;
+                    }
                 }
+                
             }
         },
         //请求删除数据
