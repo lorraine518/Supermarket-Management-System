@@ -45,9 +45,11 @@ router.get('/', function(req, res, next) {
 router.post('/accountadd', function(req, res, next) {
   //获取参数
   let {account,password,usergroup}=req.body;
+  //添加默认头像地址
+  let avatarUrl="/upload/default.jpg";
   //存入数据
   //创建SQL语句
-  const sqlStr=`insert into account(account,password,user_group) values('${account}','${password}','${usergroup}')`;
+  const sqlStr=`insert into account(account,password,user_group,avatar_url) values('${account}','${password}','${usergroup}','${avatarUrl}')`;
   // console.log(sqlStr);
   //执行sql
   connection.query(sqlStr, (err,data) => {
@@ -194,6 +196,52 @@ router.post("/passwordmodify",(req,res,next) => {
       res.send({code:1,message:"修改密码失败！"})      
     }
   })
+})
+
+
+/* ----------------- 上传后端配置 开始 -------------- */ 
+
+// 引入multer
+const multer = require('multer')
+
+// 配置上传到服务器放置的目录 和 重命名
+const storage = multer.diskStorage({
+	destination: 'public/upload', // 图片上传到服务器的这个目录
+	  // 图片重命名
+    filename (req, file, cb) {
+        var fileFormat =(file.originalname).split("."); // haha.jpg => ['haha', 'jpg']
+        // 获取时间戳
+        var filename = new Date().getTime();  
+        // 124354654 + "." + jpg
+        cb(null, filename + "." + fileFormat[fileFormat.length - 1]);
+    }
+})
+
+// 上传对象
+const upload = multer({
+    storage,
+});
+
+/* ----------------- 上传后端配置 结束-------------- */ 
+
+//请求上传头像路由
+router.post("/uploadavatar",upload.single('imgfile'),(req,res,next) => {
+  // res.send(req.file)
+  //获取文件名
+  let imgName=req.file.filename;
+  //拼接数据库中存储的图片路径
+  let path=`/upload/${imgName}`;
+  //修改数据
+  const sqlStr=`update account set avatar_url='${path}' where id=${req.user.id}`;
+  connection.query(sqlStr,(err,data) => {
+    if(err) throw err;
+    if(data.affectedRows > 0){
+      res.send({code:0,message:"上传头像成功！",path})
+    }else{
+      res.send({code:1,message:"上传头像失败！"})
+    }
+  })
+
 })
 
 module.exports = router;

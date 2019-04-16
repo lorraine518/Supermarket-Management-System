@@ -56,6 +56,7 @@ router.post('/goodsadd', function(req, res, next) {
 
 //请求商品列表路由（分页功能）
 router.get("/goodsmanage", (req,res,next) => {
+   
     //获取参数
     let {pageSize,currentPage,goodsgroup,keywords}=req.query;
     //查询数据总条数
@@ -69,6 +70,8 @@ router.get("/goodsmanage", (req,res,next) => {
     if(keywords !== ""){
         sqlStr+=` and (goodsname like '%${keywords}%' or goodscode like '%${keywords}%')`
     }
+    //倒序排列
+    sqlStr += " order by id desc"
     connection.query(sqlStr,(err,data) => {
         if(err) throw err;
         let totalData=data.length;
@@ -79,37 +82,50 @@ router.get("/goodsmanage", (req,res,next) => {
             res.send({totalData,data})
         })
     })
+    
+    
 });
 
 //请求商品删除路由
 router.get("/deletegoodsdata",(req,res,next) => {
-    //获取id
-    let{id}=req.query;
-    const sqlStr=`delete from goods where id=${id}`
-    connection.query(sqlStr,(err,data) => {
-        if(err) throw err;
-        if(data.affectedRows > 0){
-            res.send({code:0,reason:"删除成功！"})
-        }else{
-            res.send({code:1,reason:"删除失败！"})
-        }
-    })
+     //获取当前用户分组
+     let {user_group}=req.user;
+     if(user_group === "部门干员"){
+         res.send({code:3,reason:"您的权限不足，无法进行此操作！"})
+     }else{
+        //获取id
+        let{id}=req.query;
+        const sqlStr=`delete from goods where id=${id}`
+        connection.query(sqlStr,(err,data) => {
+            if(err) throw err;
+            if(data.affectedRows > 0){
+                res.send({code:0,reason:"删除成功！"})
+            }else{
+                res.send({code:1,reason:"删除失败！"})
+            }
+        })
+    }
 })
 
 //请求批量删除路由
 router.get("/multipledeletedata",(req,res,next) => {
-
-    let{selectId}=req.query;
-    //批量删除
-    const sqlStr=`delete from goods where id in (${selectId})`;
-    connection.query(sqlStr,(err,data) => {
-        if(err) throw err;
-        if(data.affectedRows > 0){
-            res.send({code:0,reason:"批量删除成功！"})
-        }else{
-            res.send({code:1,reason:"批量删除失败！"})
-        }
-    })
+    //获取当前用户分组
+    let {user_group}=req.user;
+    if(user_group === "部门干员"){
+        res.send({code:3,reason:"您的权限不足，无法进行此操作！"})
+    }else{
+        let{selectId}=req.query;
+        //批量删除
+        const sqlStr=`delete from goods where id in (${selectId})`;
+        connection.query(sqlStr,(err,data) => {
+            if(err) throw err;
+            if(data.affectedRows > 0){
+                res.send({code:0,reason:"批量删除成功！"})
+            }else{
+                res.send({code:1,reason:"批量删除失败！"})
+            }
+        })
+    }
     // res.send(selectId);
 })
 
@@ -127,19 +143,24 @@ router.get("/editGoodsData",(req,res,next) => {
 
 //请求保存修改路由
 router.post("/savegoodsedit",(req,res,next) => {
-    //接收参数
-    let{editId,goodsgroup,goodsname,goodsnum,goodsprice,salesprice,goodscode}=req.body;
-    //修改数据
-    const sqlStr=`update goods set goodsgroup='${goodsgroup}',goodsname='${goodsname}',goodsnum='${goodsnum}',goodsprice='${goodsprice}',salesprice='${salesprice}',goodscode='${goodscode}' where id=${editId}`
-    connection.query(sqlStr,(err,data) => {
-        if(err) throw err;
-        if(data.affectedRows > 0){
-            res.send({code:0,reason:"修改成功！"})
-        }else{
-            res.send({code:1,reason:"修改失败！"})            
-        }
-    })
+    //获取当前用户分组
+    let {user_group}=req.user;
+    if(user_group === "部门干员"){
+        res.send({code:3,reason:"您的权限不足，无法进行此操作！"})
+    }else{
+        //接收参数
+        let{editId,goodsgroup,goodsname,goodsnum,goodsprice,salesprice,goodscode}=req.body;
+        //修改数据
+        const sqlStr=`update goods set goodsgroup='${goodsgroup}',goodsname='${goodsname}',goodsnum='${goodsnum}',goodsprice='${goodsprice}',salesprice='${salesprice}',goodscode='${goodscode}' where id=${editId}`
+        connection.query(sqlStr,(err,data) => {
+            if(err) throw err;
+            if(data.affectedRows > 0){
+                res.send({code:0,reason:"修改成功！"})
+            }else{
+                res.send({code:1,reason:"修改失败！"})            
+            }
+        })
+    }
 })
-  
 
 module.exports = router;

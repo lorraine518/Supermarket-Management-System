@@ -55,10 +55,12 @@ router.post("/checkaccount",(req,res,next) => {
             connection.query(sqlStr,(err,data) => {
                 if(err) throw err;
                 //生成token
-                const token = jwt.sign(Object.assign({}, data[0]), secretKey, { expiresIn:60*60*2})
+                const token = jwt.sign(Object.assign({}, data[0]), secretKey, { expiresIn:60*60*2});
                 if(data.length){
-                    res.send({code:0,reason:`登陆成功！欢迎您，${account}！`,token});
+                    //获取身份信息
+                    let {user_group}=data[0];
                     //登陆成功派发token
+                    res.send({code:0,reason:`登陆成功！欢迎您，${account}！`,token,user_group});
                 }else{
                     res.send({code:1,reason:"您输入的密码不正确，请重新输入！"});
                 }
@@ -72,7 +74,11 @@ router.post("/checkaccount",(req,res,next) => {
 //请求获得当前登录用户路由
 router.get("/currentaccount",(req,res,next) => {
     //express-jwt验证token合法后，会把token的值存入req.user，即当前登录账号数据对象
-    res.send(req.user)
+    const sqlAtr=`select * from account where id=${req.user.id}`
+    connection.query(sqlAtr,(err,data) => {
+        if(err) throw err;
+        res.send(data[0]);
+    })
 })
 
 //请求验证当前用户密码
@@ -86,5 +92,67 @@ router.get("/checkpassword",(req,res,next) => {
         
     }
 })
+
+//请求当前用户导航列表
+router.get("/getusermenu",(req,res,next) => {
+    let{userGroup}=req.query;
+    //准备响应数据
+    let menus =[
+        //系统管理
+        {
+            iconClass:"el-icon-setting",
+            access:["主管","部门干员"],
+            title:"系统管理",
+            children:[
+                {path:"/home/systeminfo",subTitle:"系统信息"}
+            ]
+        },
+        //账号管理
+        {
+            iconClass:"el-icon-star-on",
+            title:"账号管理",
+            access:["主管"],
+            children:[
+                {path:"/home/accountmanage",subTitle:"账号管理"},
+                {path:"/home/accountadd",subTitle:"添加账号"},
+                {path:"/home/passwordmodify",subTitle:"密码修改"}
+            ]
+        },
+        //商品管理
+        {
+            iconClass:"el-icon-goods",
+            access:["主管","部门干员"],
+            title:"商品管理",
+            children:[
+                {path:"/home/goodsmanage",subTitle:"商品管理"},
+                {path:"/home/goodsadd",subTitle:"添加商品"}
+            ]
+        },
+        //统计管理
+        {
+            iconClass:"el-icon-tickets",
+            access:["主管"],
+            title:"统计管理",
+            children:[
+                {path:"/home/salestotal",subTitle:"销售统计"},
+                {path:"/home/stocktotal",subTitle:"进货统计"}
+            ]
+        },
+        //进货管理
+        {
+            iconClass:"el-icon-tickets",
+            access:["主管"],
+            title:"进货管理",
+            children:[
+                {path:"/home/stockmanage",subTitle:"库存管理"},
+                {path:"/home/stockadd",subTitle:"添加库存"}
+            ]
+        }
+    ]
+    //过滤导航列表
+    let filerMenu=menus.filter(item => item.access.includes(userGroup));
+    res.send(filerMenu);
+})
+
 
 module.exports = router;

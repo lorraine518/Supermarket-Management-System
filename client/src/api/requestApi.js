@@ -1,14 +1,9 @@
 //引入request
 import request from "../utils/request"
 
-export function accountaddRequest (url,params) {
-    return new Promise((resolve,reject) => {
-        request.post(url,params)
-        .then(res => {
-            resolve(res)
-        })
-        .catch(err => {
-            reject(err)
-        })
-    })
-}
+//个人中心请求用户数据
+export const getCurrentUserInfo=() => request.get("/login/currentaccount")
+
+//请求导航列表
+export const getUserMenu=(params) => request.get("/login/getusermenu",params)
+

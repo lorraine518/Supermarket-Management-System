@@ -174,7 +174,7 @@ export default {
             }
         }
         return {
-            //查询商品条件
+            //查询商品表单
             goodssearchForm:{
                 goodsgroup:"",
                 keywords:""
@@ -211,12 +211,7 @@ export default {
             },
             //查询表单验证规则
             rules:{
-                goodsgroup:[
-                    {}
-                ],
-                keywords:[
-                    {}
-                ]
+
             },
             //表格渲染数据
             goodsData:[
@@ -291,6 +286,19 @@ export default {
         searchGoods(){
             this.getGoodsData();
         },
+        //关键字显色
+        showKeywords(data){
+            //获取关键字
+            let keywords=this.goodssearchForm.keywords;
+            //遍历数据数组
+            for(const i in data){
+                if(data[i].goodsname.includes(keywords) || data[i].goodscode.includes(keywords)){
+                    //生成带有样式类的标签
+                    
+
+                }
+            }
+        },
         //请求删除数据
         deleteGoodsData(id){
             //显示弹框
@@ -313,6 +321,11 @@ export default {
                         //请求数据
                         this.getGoodsData();
                     }else if(code === 1){
+                        this.$message({
+                            type:'error',
+                            message:reason
+                        })
+                    }else{
                         this.$message({
                             type:'error',
                             message:reason
@@ -373,7 +386,7 @@ export default {
                             });
                             //请求数据
                             this.getGoodsData();
-                        }else if(code === 1){
+                        }else{
                             this.$message({
                                 type:'error',
                                 message:reason

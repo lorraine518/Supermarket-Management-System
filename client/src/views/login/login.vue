@@ -99,7 +99,7 @@ export default {
                 .then(res => {
                   // console.log(res);
                   //接收响应数据
-                  let {code,reason,token}=res;
+                  let {code,reason,token,user_group}=res;
 
                   //验证成功
                   if(code === 0){
@@ -107,9 +107,10 @@ export default {
                       type:"success",
                       message:reason
                     });
-                    //将token信息存入localStorage
+                    //将token和用户身份信息存入localStorage
                     // console.log(this.local);
                     this.local.save("z_l_y_p_s_2019",token);
+                    this.local.save("user_access",user_group);
                     //页面跳转
                     this.$router.push("/home");
                   }else{
@@ -123,8 +124,6 @@ export default {
                 .catch(err => {
                   console.log(err);
                 });
-
-                
             }else{
                 console.log("验证失败！");
                 return;

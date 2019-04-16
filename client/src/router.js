@@ -22,6 +22,11 @@ export default new Router({
       //重定向
       redirect:"/home/systeminfo",
       children:[
+        //个人中心
+        {
+          path:"/home/userinfo",
+          component:() => import("./views/userinfo/userinfo.vue")
+        },
         //账号添加
         {
           path:"/home/accountadd",

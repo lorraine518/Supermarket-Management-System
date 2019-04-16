@@ -6,11 +6,11 @@
             </el-aside>
             <el-container>
                 <el-header>
-                    <Top></Top>
+                    <Top ref="top"></Top>
                 </el-header>
                 <el-main>
                     <!-- 路由出口 -->
-                    <router-view></router-view>
+                    <router-view @getavatar="getUserAvatar"></router-view>
                 </el-main>
                 <el-footer>
                     <Bottom></Bottom>
@@ -35,6 +35,12 @@ export default {
         leftnav,
         Top,
         Bottom
+    },
+    methods:{
+        getUserAvatar(){
+            //调用顶部组件方法
+            this.$refs.top.getUserInfo();
+        }
     }
 }
 </script>

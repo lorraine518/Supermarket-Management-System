@@ -22,57 +22,31 @@
 </template>
 
 <script>
+import {getCurrentUserInfo,getUserMenu} from "@/api/requestApi";
 export default {
     data(){
         return {
             //菜单数据
-            menus:[
-                //系统管理
-                {
-                    iconClass:"el-icon-setting",
-                    title:"系统管理",
-                    children:[
-                        {path:"/home/systeminfo",subTitle:"系统信息"}
-                    ]
-                },
-                //账号管理
-                {
-                    iconClass:"el-icon-star-on",
-                    title:"账号管理",
-                    children:[
-                        {path:"/home/accountmanage",subTitle:"账号管理"},
-                        {path:"/home/accountadd",subTitle:"添加账号"},
-                        {path:"/home/passwordmodify",subTitle:"密码修改"}
-                    ]
-                },
-                //商品管理
-                {
-                    iconClass:"el-icon-goods",
-                    title:"商品管理",
-                    children:[
-                        {path:"/home/goodsmanage",subTitle:"商品管理"},
-                        {path:"/home/goodsadd",subTitle:"添加商品"}
-                    ]
-                },
-                //统计管理
-                {
-                    iconClass:"el-icon-tickets",
-                    title:"统计管理",
-                    children:[
-                        {path:"/home/salestotal",subTitle:"销售统计"},
-                        {path:"/home/stocktotal",subTitle:"进货统计"}
-                    ]
-                },
-                //进货管理
-                {
-                    iconClass:"el-icon-tickets",
-                    title:"进货管理",
-                    children:[
-                        {path:"/home/stockmanage",subTitle:"库存管理"},
-                        {path:"/home/stockadd",subTitle:"添加库存"}
-                    ]
-                }
-            ]
+            menus:[]
+        }
+    },
+    created(){
+        this.getUserAccess();
+    },
+    methods:{
+        //请求获取当前用户显示菜单
+        getUserAccess(){
+            //获取用户身份信息
+            let userGroup=this.local.get("user_access");
+            //发送请求获取导航列表
+            getUserMenu({userGroup})
+            .then(res => {
+                console.log(res);
+                this.menus=res;
+            })
+            .catch(err => {
+                console.log(res);
+            })
         }
     }
 }
